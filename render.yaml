@@ -1,10 +1,11 @@
 services:
   # ---------------------------------------------------------------------------
-  # Backend: FastAPI Web Service
+  # Backend: FastAPI Web Service (Free Tier)
   # ---------------------------------------------------------------------------
   - type: web
     name: sql-chat-backend
     runtime: python
+    plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
@@ -14,7 +15,7 @@ services:
         value: 3.11.9
 
   # ---------------------------------------------------------------------------
-  # Frontend: React + Vite Static Site
+  # Frontend: React + Vite Static Site (Free by default on Render)
   # ---------------------------------------------------------------------------
   - type: web
     name: sql-chat-frontend
