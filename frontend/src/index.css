@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Global ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #f8f9fc;
+  color: #1e2337;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Scrollbars ──────────────────────────────────────────────── */
+::-webkit-scrollbar               { width: 5px; height: 5px; }
+::-webkit-scrollbar-track         { background: #f1f3f8; }
+::-webkit-scrollbar-thumb         { background: #c8cedf; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover   { background: #4f46e5; }
+
+/* ─── Glass card ─────────────────────────────────────────────── */
+.glass {
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(79,70,229,0.08);
+}
+
+.glass-dark {
+  background: rgba(248,249,252,0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(200,206,223,0.5);
+}
+
+/* ─── Gradient text ──────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 50%, #818cf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-emerald {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── SQL syntax highlight (light theme) ─────────────────────── */
+.sql-keyword  { color: #7c3aed; font-weight: 600; }
+.sql-function { color: #2563eb; }
+.sql-string   { color: #16a34a; }
+.sql-number   { color: #d97706; }
+.sql-comment  { color: #9ca3af; font-style: italic; }
+.sql-table    { color: #b45309; }
+.sql-operator { color: #0891b2; }
+
+/* ─── Animated gradient border ───────────────────────────────── */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, #4f46e5, #818cf8, #4f46e5);
+  background-size: 200% 200%;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: gradientBorderAnim 4s ease infinite;
+}
+
+@keyframes gradientBorderAnim {
+  0%, 100% { background-position: 0% 50%;   }
+  50%       { background-position: 100% 50%; }
+}
+
+/* ─── Neon pulse (subtle on white) ──────────────────────────── */
+.neon-pulse {
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.12), 0 2px 8px rgba(79,70,229,0.2);
+  animation: neonPulse 2.5s ease-in-out infinite;
+}
+@keyframes neonPulse {
+  0%,100% { box-shadow: 0 0 0 3px rgba(79,70,229,0.12), 0 2px 8px rgba(79,70,229,0.2); }
+  50%     { box-shadow: 0 0 0 4px rgba(79,70,229,0.2),  0 4px 16px rgba(79,70,229,0.3); }
+}
+
+/* ─── Table hover rows ───────────────────────────────────────── */
+.data-row:hover td { background: rgba(79,70,229,0.04); }
+.data-row td { transition: background 0.15s ease; }
+
+/* ─── Spinner ────────────────────────────────────────────────── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(79,70,229,0.2);
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Choice button ──────────────────────────────────────────── */
+.choice-btn {
+  background: #f1f3f8;
+  border: 1.5px solid #dde1ef;
+  color: #4b5563;
+  transition: all 0.2s ease;
+}
+.choice-btn:hover, .choice-btn.selected {
+  background: #eef2ff;
+  border-color: #6366f1;
+  color: #4338ca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79,70,229,0.15);
+}
+.choice-btn.selected {
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  font-weight: 600;
+}
+
+/* ─── Card ───────────────────────────────────────────────────── */
+.card {
+  background: #ffffff;
+  border: 1px solid #e8ebf4;
+  border-radius: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.05);
+}
+
+/* ─── Upload drop zone ───────────────────────────────────────── */
+.drop-zone {
+  border: 2px dashed #c7d2fe;
+  background: #f5f7ff;
+  transition: all 0.2s ease;
+}
+.drop-zone:hover, .drop-zone.drag-over {
+  border-color: #6366f1;
+  background: #eef2ff;
+}
+
+/* ─── Typing cursor ──────────────────────────────────────────── */
+.typing-cursor::after {
+  content: '|';
+  animation: blink 1s step-end infinite;
+  color: #6366f1;
+  margin-left: 2px;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
