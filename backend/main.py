@@ -17,6 +17,7 @@ import sqlite3
 import tempfile
 import textwrap
 from pathlib import Path
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -32,28 +33,62 @@ from sql_generator import build_sql, execute_sql, validate_sql
 _active_db_name: str = "E-Commerce SQLite"
 
 # ---------------------------------------------------------------------------
-# App initialisation
+# App initialisation & Lifespan
 # ---------------------------------------------------------------------------
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ensure SQLite database is created and seeded on application startup
+    init_db()
+    yield
 
 app = FastAPI(
     title="Text-to-SQL Engine",
     description="Natural language to SQL with interactive clarification loop",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Configure CORS safely for production (Render) and local development
+cors_origins_env = os.environ.get("CORS_ORIGINS") or os.environ.get("FRONTEND_URL", "")
+if cors_origins_env.strip() and cors_origins_env.strip() != "*":
+    allowed_origins = [orig.strip() for orig in cors_origins_env.split(",") if orig.strip()]
+    for dev_origin in ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]:
+        if dev_origin not in allowed_origins:
+            allowed_origins.append(dev_origin)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 analyser = QueryAnalyser()
 
 
-@app.on_event("startup")
-def startup():
-    init_db()
+# ---------------------------------------------------------------------------
+# Health Check Endpoints (for Render, uptime monitors, and cloud deployments)
+# ---------------------------------------------------------------------------
+
+@app.get("/")
+@app.get("/health")
+@app.get("/api/health")
+def health_check():
+    """Returns 200 OK for Render health checks and connectivity verification."""
+    return {
+        "status": "healthy",
+        "service": "Text-to-SQL Engine",
+        "active_database": _active_db_name,
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -263,3 +298,16 @@ def _build_clarification_message(ambiguities: list[str]) -> str:
     }
     parts = [msgs[a] for a in ambiguities if a in msgs]
     return " ".join(parts) or "Please clarify a few details before I generate the SQL."
+
+
+# ---------------------------------------------------------------------------
+# Production Server Entrypoint
+# ---------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    import uvicorn
+
+    port = int(os.environ.get("PORT", 8000))
+    host = os.environ.get("HOST", "0.0.0.0")
+    print(f"[Text-to-SQL Server] Running on http://{host}:{port}")
+    uvicorn.run("main:app", host=host, port=port, reload=False)

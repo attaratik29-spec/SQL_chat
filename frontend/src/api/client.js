@@ -1,7 +1,21 @@
 import axios from 'axios'
 
+// Determine the API base URL:
+// - In production (e.g., deployed on Render), VITE_API_BASE_URL points to the backend URL
+//   (e.g., "https://sql-chat-backend.onrender.com" or "https://sql-chat-backend.onrender.com/api").
+// - In local development (when VITE_API_BASE_URL is not set), it defaults to '/api',
+//   which Vite's local dev server automatically proxies to http://localhost:8000.
+const rawBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').trim()
+const cleanBaseUrl = rawBaseUrl.replace(/\/+$/, '')
+
+const resolvedBaseUrl = cleanBaseUrl
+  ? cleanBaseUrl.endsWith('/api')
+    ? cleanBaseUrl
+    : `${cleanBaseUrl}/api`
+  : '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: resolvedBaseUrl,
   headers: { 'Content-Type': 'application/json' },
   timeout: 30000,
 })

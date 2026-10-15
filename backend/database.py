@@ -9,7 +9,7 @@ import random
 import os
 from datetime import datetime, timedelta
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "ecommerce.db")
+DB_PATH = os.environ.get("DATABASE_PATH", os.path.join(os.path.dirname(__file__), "ecommerce.db"))
 
 
 # ---------------------------------------------------------------------------
