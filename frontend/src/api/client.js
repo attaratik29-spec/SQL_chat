@@ -5,8 +5,11 @@ import axios from 'axios'
 //   (e.g., "https://sql-chat-backend.onrender.com" or "https://sql-chat-backend.onrender.com/api").
 // - In local development (when VITE_API_BASE_URL is not set), it defaults to '/api',
 //   which Vite's local dev server automatically proxies to http://localhost:8000.
-const rawBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').trim()
-const cleanBaseUrl = rawBaseUrl.replace(/\/+$/, '')
+let cleanBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
+
+if (cleanBaseUrl && !cleanBaseUrl.startsWith('/') && !cleanBaseUrl.startsWith('http://') && !cleanBaseUrl.startsWith('https://')) {
+  cleanBaseUrl = `https://${cleanBaseUrl}`
+}
 
 const resolvedBaseUrl = cleanBaseUrl
   ? cleanBaseUrl.endsWith('/api')
